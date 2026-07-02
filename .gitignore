@@ -1,0 +1,6 @@
+datamart.db
+logs/*.log
+logs/reportes/*.json
+__pycache__/
+**/__pycache__/
+*.pyc

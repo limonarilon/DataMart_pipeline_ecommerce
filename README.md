@@ -17,6 +17,9 @@ pip install -r requirements.txt
 ```
 
 No necesitas instalar SQLite aparte: viene incluido en Python (`sqlite3`).
+Tampoco necesitas crear variables de entorno para ejecutar el proyecto: `src/config.py`
+usa rutas por defecto que funcionan directamente en este repositorio. Si quieres
+personalizar rutas, puedes hacerlo de forma opcional en un archivo `.env`.
 La base de datos (`datamart.db`) se crea automáticamente al ejecutar el pipeline.
 
 ## 2. Ejecutar el pipeline (carga de datos)
@@ -41,7 +44,7 @@ rechazados y tiempo total.
 ## 3. Ver el dashboard
 
 ```bash
-streamlit run dashboard/app.py
+python -m streamlit run dashboard/app.py
 ```
 
 Se abrirá en el navegador (`http://localhost:8501`) con:
@@ -67,7 +70,7 @@ python -m src.scheduler
 proyecto-datamart-eft/
 ├── README.md
 ├── requirements.txt
-├── .env.example              # variables de entorno (copiar a .env si quieres cambiar algo)
+├── .env.example              # opcional: copiar a .env solo si quieres cambiar rutas/valores
 ├── data/
 │   └── Online_Retail.xlsx    # archivo origen
 ├── db/

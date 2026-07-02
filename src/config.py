@@ -1,15 +1,15 @@
 """
 config.py
 ---------
-Configuración centralizada del pipeline. Se leen los valores desde variables
-de entorno (con valores por defecto) para no dejar rutas ni parámetros
-"hardcodeados" en el código -> buena práctica evaluada en la rúbrica.
+Configuración centralizada del pipeline. El proyecto funciona con valores por
+defecto listos para usar, y las variables de entorno son opcionales para
+personalizar rutas o parámetros sin tocar el código.
 """
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()  # carga el archivo .env si existe
+load_dotenv()  # carga el archivo .env si existe; si no, se usan los defaults
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

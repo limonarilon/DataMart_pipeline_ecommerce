@@ -1,6 +1,17 @@
+# Bases de datos generadas por el pipeline (supera 100 MB con el dataset completo)
 datamart.db
+benchmark.db
+
+# Logs y reportes generados en cada ejecución
 logs/*.log
 logs/reportes/*.json
+
+# Cache de Python
 __pycache__/
-**/__pycache__/
 *.pyc
+
+# Entorno virtual
+venv/
+
+# Variables de entorno personalizadas (opcional, no se versiona si existe)
+.env

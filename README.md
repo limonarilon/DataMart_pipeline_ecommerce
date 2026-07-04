@@ -17,9 +17,6 @@ pip install -r requirements.txt
 ```
 
 No necesitas instalar SQLite aparte: viene incluido en Python (`sqlite3`).
-Tampoco necesitas crear variables de entorno para ejecutar el proyecto: `src/config.py`
-usa rutas por defecto que funcionan directamente en este repositorio. Si quieres
-personalizar rutas, puedes hacerlo de forma opcional en un archivo `.env`.
 La base de datos (`datamart.db`) se crea automáticamente al ejecutar el pipeline.
 
 ## 2. Ejecutar el pipeline (carga de datos)
@@ -64,13 +61,35 @@ python -m src.scheduler --now
 python -m src.scheduler
 ```
 
-## 5. Estructura del proyecto
+## 5. Medir la optimización (evidencia para el informe y la defensa)
+
+Existe un script aparte, `src/benchmark.py`, que compara fila-por-fila vs bulk
+insert, y tareas asíncronas secuenciales vs en paralelo. No toca `datamart.db`
+(usa `benchmark.db`, que se puede borrar sin problema).
+
+```bash
+python -m src.benchmark                # usa 50.000 filas de muestra
+python -m src.benchmark --rows 100000  # ajustar tamaño de muestra
+```
+
+Para comparar el efecto del tamaño de lote (`BATCH_SIZE`) en la carga principal,
+corre el pipeline varias veces con el flag `--batch-size`:
+
+```bash
+python -m src.pipeline --batch-size 500
+python -m src.pipeline --batch-size 5000
+python -m src.pipeline --batch-size 20000
+```
+
+Compara el valor de `tiempo_ms` que imprime cada corrida en consola.
+
+## 6. Estructura del proyecto
 
 ```
 proyecto-datamart-eft/
 ├── README.md
 ├── requirements.txt
-├── .env.example              # opcional: copiar a .env solo si quieres cambiar rutas/valores
+├── .env.example              # variables de entorno (copiar a .env si quieres cambiar algo)
 ├── data/
 │   └── Online_Retail.xlsx    # archivo origen
 ├── db/
@@ -83,13 +102,14 @@ proyecto-datamart-eft/
 │   ├── cargador.py           # carga a SQLite (bulk insert = optimización)
 │   ├── async_tasks.py        # tareas ASÍNCRONAS en paralelo (reporte/log/notificación)
 │   ├── scheduler.py          # calendarización (equivalente a cron)
-│   └── pipeline.py           # orquestador principal
+│   ├── pipeline.py           # orquestador principal
+│   └── benchmark.py          # mide optimización: fila-por-fila vs bulk, secuencial vs paralelo
 ├── dashboard/
 │   └── app.py                # visualización (Streamlit)
 └── logs/                     # logs de ejecución + reportes JSON (se generan solos)
 ```
 
-## 6. Arquitectura y paradigma aplicado
+## 7. Arquitectura y paradigma aplicado
 
 ```
 Online_Retail.xlsx
@@ -123,7 +143,7 @@ ventas    devoluciones    rechazos     (SQLite)
 tipo microservicios (cada módulo de `src/` hace una sola cosa), combinado
 con una fase asíncrona para las tareas no críticas.
 
-## 7. Datos de prueba para la defensa (casos límite)
+## 8. Datos de prueba para la defensa (casos límite)
 
 Puedes armar un `datos_prueba.csv` pequeño con estas filas para demostrar
 en vivo cada regla del validador:

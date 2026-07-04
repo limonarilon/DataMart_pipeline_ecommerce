@@ -9,8 +9,9 @@ Ejecuta el flujo completo:
         -> Log de ejecución (trazabilidad)
 
 Uso:
-    python -m src.pipeline                  # ejecuta una vez, ahora
-    python -m src.pipeline --file otro.xlsx  # usa otro archivo origen
+    python -m src.pipeline                        # ejecuta una vez, con el batch_size por defecto
+    python -m src.pipeline --file otro.xlsx        # usa otro archivo origen
+    python -m src.pipeline --batch-size 1000       # sobreescribe el tamaño de lote (para medir optimización)
 """
 import argparse
 import logging
@@ -37,13 +38,14 @@ def configurar_logging(job_id: str):
     return log_file
 
 
-def ejecutar_pipeline(archivo: str = None) -> dict:
+def ejecutar_pipeline(archivo: str = None, batch_size: int = None) -> dict:
     job_id = uuid.uuid4().hex[:8]
     log_file = configurar_logging(job_id)
     logger = logging.getLogger("datamart.pipeline")
 
     archivo = archivo or config.DATA_PATH
-    logger.info(f"===== INICIO JOB {job_id} | origen: {archivo} =====")
+    batch_size = batch_size or config.BATCH_SIZE
+    logger.info(f"===== INICIO JOB {job_id} | origen: {archivo} | batch_size: {batch_size} =====")
     inicio = time.perf_counter()
 
     inicializar_bd(config.DB_PATH, config.SCHEMA_PATH)
@@ -53,7 +55,7 @@ def ejecutar_pipeline(archivo: str = None) -> dict:
 
     total_validos = total_devoluciones = total_rechazados = 0
 
-    for lote in generar_lotes(df_total, config.BATCH_SIZE):
+    for lote in generar_lotes(df_total, batch_size):
         validos, devoluciones, rechazados = validar_lote(lote)
 
         ventas_out = procesar_ventas(validos, job_id)
@@ -75,6 +77,7 @@ def ejecutar_pipeline(archivo: str = None) -> dict:
         "total_rechazados": total_rechazados,
         "tiempo_ms": tiempo_ms,
         "origen_archivo": archivo,
+        "batch_size": batch_size,
     }
 
     # Los datos críticos YA están en la base -> ahora se disparan tareas
@@ -94,5 +97,6 @@ def ejecutar_pipeline(archivo: str = None) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pipeline ETL DataMart")
     parser.add_argument("--file", type=str, default=None, help="Ruta alternativa del archivo origen")
+    parser.add_argument("--batch-size", type=int, default=None, help="Tamaño de lote a usar en esta corrida (sobreescribe config.py)")
     args = parser.parse_args()
-    ejecutar_pipeline(args.file)
+    ejecutar_pipeline(args.file, args.batch_size)

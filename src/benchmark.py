@@ -130,8 +130,7 @@ def main(rows: int):
     print(f"  Paralelo (asyncio.gather):  {t_paralelo} ms")
     print(f"  Mejora:                     {mejora_async}% más rápido en paralelo")
 
-    print(f"\nBase de benchmark (se puede borrar): {BENCH_DB}")
-    print("\nCopia estos números a la sección de optimización del informe y de la guía de defensa.")
+    print(f"\nBenchmark completado. Base temporal: {BENCH_DB}")
 
 
 if __name__ == "__main__":

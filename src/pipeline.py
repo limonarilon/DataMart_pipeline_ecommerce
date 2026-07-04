@@ -51,6 +51,7 @@ def ejecutar_pipeline(archivo: str = None, batch_size: int = None) -> dict:
     inicializar_bd(config.DB_PATH, config.SCHEMA_PATH)
 
     df_total = leer_datos(archivo)
+    df_total["_es_duplicado_global"] = df_total.duplicated(keep="first")
     total_leidos = len(df_total)
 
     total_validos = total_devoluciones = total_rechazados = 0

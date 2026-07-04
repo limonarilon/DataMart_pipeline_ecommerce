@@ -29,7 +29,10 @@ def validar_lote(df: pd.DataFrame):
     df["causa"] = None
 
     # 1) Duplicados exactos (se conserva la primera ocurrencia)
-    es_duplicado = df.duplicated(keep="first")
+    if "_es_duplicado_global" in df.columns:
+        es_duplicado = df["_es_duplicado_global"].fillna(False).astype(bool)
+    else:
+        es_duplicado = df.duplicated(keep="first")
     df.loc[es_duplicado, "causa"] = "duplicado"
 
     # 2) Cliente no identificado
